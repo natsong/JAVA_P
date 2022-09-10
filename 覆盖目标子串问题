@@ -1,0 +1,35 @@
+链接
+https://leetcode.cn/problems/minimum-window-substring/solution/leetcode-76-zui-xiao-fu-gai-zi-chuan-cja-lmqz/
+简要概括如何覆盖目标子串。
+定义两个哈希表ht,hs，一个哈希表用于维护目标子串中每个字母对应的出现次数，Key-value （出现字符-字符出现次数）。一个哈希表用于记录滑动窗口中所包含字符出现次数。
+当hs中的字符出现次数比ht字符出现次数小的时候表示还需要继续拓展窗口以获取对应的字符。拓展窗口的 同时 需要收缩窗口。假设用left、right 两个指针来确定窗口的范围，
+用cnt来表示满足覆盖目标子串所需要的字符。当 hs.get(s[i]) < ht.get(s[i]) 表示还需要继续拓展以获取对应的s[i]
+
+class Solution {
+    public String minWindow(String s, String t) {
+        HashMap<Character,Integer> hs = new HashMap<Character,Integer>();
+        HashMap<Character,Integer> ht = new HashMap<Character,Integer>();
+        for(int i = 0;i < t.length();i ++){
+            ht.put(t.charAt(i),ht.getOrDefault(t.charAt(i), 0) + 1);
+        }
+        String ans = "";
+        int len = 0x3f3f3f3f, cnt = 0;  //有多少个元素符合
+        for(int i = 0,j = 0;i < s.length();i ++)
+        {
+            hs.put(s.charAt(i), hs.getOrDefault(s.charAt(i), 0) + 1);
+            //在将s串中的字符入表的时候，比较 hs和ht表中其值为多少，若是，ht对应的值较大，表示还需要继续
+            if(ht.containsKey(s.charAt(i)) && hs.get(s.charAt(i)) <= ht.get(s.charAt(i))) cnt ++;
+            while(j < i && (!ht.containsKey(s.charAt(j)) || hs.get(s.charAt(j)) > ht.get(s.charAt(j))))
+            {
+                int count = hs.get(s.charAt(j)) - 1;
+                hs.put(s.charAt(j), count);
+                j ++;
+            }
+            if(cnt == t.length() && i - j + 1 < len){
+                len = i - j + 1;
+                ans = s.substring(j,i + 1);
+            }
+        }
+        return ans;
+    }
+}
